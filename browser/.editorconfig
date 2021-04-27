@@ -1,0 +1,6 @@
+[*]
+indent_size = 2
+
+[.devcontainer/**]
+indent_size = unset
+indent_style = unset
