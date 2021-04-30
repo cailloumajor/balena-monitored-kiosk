@@ -1,9 +1,11 @@
+import { ErrorRequestHandler } from "express"
 import morgan from "morgan"
-import winston from "winston"
+import { createLogger, format, transports } from "winston"
 
-export const logger = winston.createLogger({
+export const logger = createLogger({
+  format: format.combine(format.errors(), format.json()),
   level: process.env.NODE_ENV === "production" ? "info" : "debug",
-  transports: [new winston.transports.Console()],
+  transports: [new transports.Console()],
 })
 
 export const loggingMiddleware = morgan("combined", {
@@ -15,3 +17,11 @@ export const loggingMiddleware = morgan("combined", {
   skip: (req, res) =>
     process.env.NODE_ENV === "production" && res.statusCode < 400,
 })
+
+export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err)
+  }
+  logger.error(err)
+  res.sendStatus(500)
+}
