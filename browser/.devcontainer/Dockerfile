@@ -14,3 +14,13 @@ FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${VARIANT}
 
 # [Optional] Uncomment if you want to install more global node modules
 # RUN su node -c "npm install -g <your-package-list-here>"
+
+COPY library-scripts/desktop-lite-debian.sh /tmp/library-scripts/
+RUN apt-get update \
+    && bash /tmp/library-scripts/desktop-lite-debian.sh \
+    && apt-get install --no-install-recommends -y chromium \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+ENV DBUS_SESSION_BUS_ADDRESS="autolaunch:" DISPLAY=":1" LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8"
+ENTRYPOINT ["/usr/local/share/desktop-init.sh"]
+CMD ["sleep", "infinity"]

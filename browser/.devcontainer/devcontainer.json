@@ -8,6 +8,10 @@
 		"args": { "VARIANT": "14" }
 	},
 
+	"runArgs": ["--init", "--security-opt", "seccomp=unconfined"],
+
+	"overrideCommand": false,
+
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/zsh",
@@ -28,7 +32,7 @@
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+	"forwardPorts": [6080, 5901],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "yarn install",
