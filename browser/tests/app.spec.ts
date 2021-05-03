@@ -3,18 +3,21 @@
     {
       "assertFunctionNames": [
         "expect",
-        "appRequest.**.expect"
+        "request.**.expect"
       ]
     }
   ]
 */
+import express from "express"
 import request from "supertest"
 
-import { app } from "../src/app"
+import { createApp, configureTerminus } from "../src/app"
 
-const appRequest = request(app)
+test("health check endpoint", () => {
+  const app = express()
+  const server = configureTerminus(app)
+  return request(server).get("/health").expect(200).expect({ status: "ok" })
+})
 
-test("health check endpoint", () =>
-  appRequest.get("/health").expect(200).expect({ status: "ok" }))
-
-test("favicon request", () => appRequest.get("/favicon.ico").expect(204))
+test("favicon request", () =>
+  request(createApp()).get("/favicon.ico").expect(204))

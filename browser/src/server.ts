@@ -1,18 +1,17 @@
-/* istanbul ignore file */
-import { Launcher } from "chrome-launcher"
-
-import { app } from "./app"
+import { createApp, configureTerminus } from "./app"
+import { startupCheck } from "./browser"
+import config from "./config"
 import { logger } from "./logging"
 
-const port = process.env.API_PORT || 3000
-
-try {
-  Launcher.getInstallations()
-} catch (error) {
-  logger.error(error)
-  process.exit(1)
+function main(): void {
+  startupCheck()
+  const app = createApp()
+  const server = configureTerminus(app)
+  server.listen(config.PORT, () => {
+    logger.info(`Listening on port ${config.PORT}`)
+  })
 }
 
-app.listen(port, () => {
-  logger.info(`Listening on port ${port}`)
-})
+if (require.main === module) {
+  main()
+}

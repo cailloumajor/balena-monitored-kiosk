@@ -1,34 +1,40 @@
 import http from "http"
 
-import { createTerminus, HealthCheckMap } from "@godaddy/terminus"
-import { killAll } from "chrome-launcher"
-import express from "express"
+import { HealthCheckMap, createTerminus } from "@godaddy/terminus"
+import express, { Express } from "express"
 
+import { killInstances } from "./browser"
 import { errorHandler, logger, loggingMiddleware } from "./logging"
 
-const expressApp = express()
+export function createApp(): Express {
+  logger.debug("Creating Express app")
+  const app = express()
 
-expressApp.use(loggingMiddleware)
+  app.use(loggingMiddleware)
 
-expressApp.get("/favicon.ico", (req, res) => {
-  res.status(204).end()
-})
+  app.get("/favicon.ico", (req, res) => {
+    res.status(204).end()
+  })
 
-expressApp.use(errorHandler)
+  app.use(errorHandler)
+
+  return app
+}
 
 const healthChecks: HealthCheckMap = {
   "/health": () => Promise.resolve(),
 }
 
-/* istanbul ignore next */
-async function onSignal() {
-  logger.info("Killing Chrome instances")
-  await killAll()
-}
+export function configureTerminus(app: Express): http.Server {
+  logger.debug("Configuring Terminus")
+  const server = http.createServer(app)
 
-export const app = createTerminus(http.createServer(expressApp), {
-  healthChecks,
-  logger: logger.error,
-  signals: ["SIGINT", "SIGTERM"],
-  onSignal,
-})
+  createTerminus(server, {
+    healthChecks,
+    logger: logger.error,
+    signals: ["SIGINT", "SIGTERM"],
+    onSignal: killInstances,
+  })
+
+  return server
+}
