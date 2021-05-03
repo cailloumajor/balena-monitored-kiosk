@@ -8,6 +8,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
+    "lint": "eslint \"src/**/*.ts\"",
     "test": "jest",
     "watch": "tsc-watch --onSuccess \"node .\""
   },
