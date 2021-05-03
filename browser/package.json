@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "watch": "tsc-watch --onSuccess 'node .'"
+    "watch": "tsc-watch --onSuccess \"node .\""
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.0",
