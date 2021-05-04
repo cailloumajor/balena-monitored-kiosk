@@ -12,6 +12,7 @@ function main(): void {
   })
 }
 
+/* istanbul ignore next */
 if (require.main === module) {
   main()
 }
