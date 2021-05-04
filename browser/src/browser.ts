@@ -1,5 +1,6 @@
 import { Launcher, killAll, launch } from "chrome-launcher"
 
+import config from "./config"
 import { logger } from "./logging"
 
 export function startupCheck(): void {
@@ -30,7 +31,7 @@ export async function launchInstance(startingUrl: string): Promise<number> {
   const { port } = await launch({
     chromeFlags,
     startingUrl,
-    logLevel: process.env.NODE_ENV === "production" ? "silent" : "info",
+    logLevel: config.PROD ? "silent" : "info",
     maxConnectionRetries: 20,
   })
 
