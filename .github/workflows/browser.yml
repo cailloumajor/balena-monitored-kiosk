@@ -1,4 +1,4 @@
-name: Browser code quality, tests and coverage
+name: Browser code
 
 on:
   push:
@@ -20,23 +20,14 @@ defaults:
 
 jobs:
   test:
-    name: Node ${{ matrix.node-version}} on ${{ matrix.architecture }}
+    name: Code quality, tests and code coverage
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        architecture:
-          - x64
-          # - arm64
-        node-version:
-          - 14
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          architecture: ${{ matrix.architecture }}
-          node-version: ${{ matrix.node-version }}
+          node-version: "14"
       - name: Install packages
         run: yarn install --frozen-lockfile
       - name: Check code quality
