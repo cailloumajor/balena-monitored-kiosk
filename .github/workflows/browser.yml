@@ -1,0 +1,50 @@
+name: Browser code quality, tests and coverage
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - browser/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - browser/**
+
+defaults:
+  run:
+    working-directory: browser
+
+jobs:
+  test:
+    name: Node ${{ matrix.node-version}} on ${{ matrix.architecture }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture:
+          - x64
+          - arm64
+        node-version:
+          - 14
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          architecture: ${{ matrix.architecture }}
+          node-version: ${{ matrix.node-version }}
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+      - name: Check code quality
+        run: yarn lint
+      - name: Check TypeScript code
+        run: yarn build --noEmit
+      - name: Run tests
+        run: yarn test
+      - name: Upload code coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          flags: unittests
+          fail_ci_if_error: true
+          working-directory: browser
