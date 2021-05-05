@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { createApp, configureTerminus } from "./app"
 import { startupCheck } from "./browser"
 import config from "./config"
@@ -12,7 +13,6 @@ function main(): void {
   })
 }
 
-/* istanbul ignore next */
 if (require.main === module) {
   main()
 }
