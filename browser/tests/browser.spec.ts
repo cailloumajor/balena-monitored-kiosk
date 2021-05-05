@@ -38,11 +38,10 @@ describe("startupCheck()", () => {
   })
 })
 
-test("killInstances() calls killAll", () => {
+test("killInstances() calls killAll", async () => {
   mockedKillAll.mockResolvedValue([])
-  return killInstances().then(() => {
-    expect(mockedKillAll).toHaveBeenCalled()
-  })
+  await killInstances()
+  expect(mockedKillAll).toHaveBeenCalled()
 })
 
 describe("launchInstance()", () => {
@@ -51,15 +50,14 @@ describe("launchInstance()", () => {
     return expect(launchInstance("")).rejects.toThrow("Error killing instances")
   })
 
-  test("launches an instance", () => {
+  test("launches an instance", async () => {
     mockedKillAll.mockResolvedValue([])
     mockedLaunch.mockResolvedValue({ port: 42 } as LaunchedChrome)
-    return launchInstance("testurl").then((port) => {
-      expect(mockedKillAll).toHaveBeenCalled()
-      expect(mockedLaunch).toHaveBeenCalledWith(
-        expect.objectContaining({ startingUrl: "testurl" })
-      )
-      expect(port).toEqual(42)
-    })
+    const port = await launchInstance("testurl")
+    expect(mockedKillAll).toHaveBeenCalled()
+    expect(mockedLaunch).toHaveBeenCalledWith(
+      expect.objectContaining({ startingUrl: "testurl" })
+    )
+    expect(port).toEqual(42)
   })
 })
