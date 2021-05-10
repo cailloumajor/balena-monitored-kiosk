@@ -1,8 +1,12 @@
+import { readFile } from "fs/promises"
+
 import { LaunchedChrome, Launcher, killAll, launch } from "chrome-launcher"
 import { mocked } from "ts-jest/utils"
 
 import { killInstances, launchInstance, startupCheck } from "../src/browser"
 
+jest.mock("fs/promises")
+const mockedReadFile = mocked(readFile)
 jest.mock("chrome-launcher")
 const mockedLauncher = mocked(Launcher)
 const mockedKillAll = mocked(killAll)
@@ -52,9 +56,12 @@ describe("launchInstance()", () => {
 
   test("launches an instance", async () => {
     mockedKillAll.mockResolvedValue([])
+    mockedLauncher.defaultFlags.mockReturnValue([])
+    mockedReadFile.mockResolvedValue(Buffer.from("1,2"))
     mockedLaunch.mockResolvedValue({ port: 42 } as LaunchedChrome)
     const port = await launchInstance("testurl")
     expect(mockedKillAll).toHaveBeenCalled()
+    expect(mockedLauncher.defaultFlags).toHaveBeenCalled()
     expect(mockedLaunch).toHaveBeenCalledWith(
       expect.objectContaining({ startingUrl: "testurl" })
     )

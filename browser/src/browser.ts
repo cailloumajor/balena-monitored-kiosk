@@ -1,3 +1,5 @@
+import { readFile } from "fs/promises"
+
 import { Launcher, killAll, launch } from "chrome-launcher"
 
 import config from "./config"
@@ -18,8 +20,6 @@ export async function killInstances(): Promise<void> {
   await killAll()
 }
 
-const chromeFlags = ["--kiosk"]
-
 export async function launchInstance(startingUrl: string): Promise<number> {
   logger.debug("Killing Chrome instances before launching a new one")
   const errors = await killAll()
@@ -27,11 +27,32 @@ export async function launchInstance(startingUrl: string): Promise<number> {
     throw new Error("Error killing instances before launching a new one")
   }
 
+  const chromeFlags = Launcher.defaultFlags().concat([
+    "--enable-accelerated-video-decode",
+    "--enable-gpu-rasterization",
+    "--enable-zero-copy",
+    "--ignore-gpu-blocklist",
+    "--kiosk",
+  ])
+
+  const sysfsSizeFile = "/sys/class/graphics/fb0/virtual_size"
+  try {
+    const sizeBuffer = await readFile(sysfsSizeFile)
+    const windowSize = sizeBuffer.toString().trim()
+    const windowSizeFlag = `--window-size=${windowSize}`
+    logger.debug(`Setting "${windowSizeFlag}"`)
+    chromeFlags.push(windowSizeFlag)
+  } catch {
+    logger.debug(`Unable to read ${sysfsSizeFile}`)
+  }
+
   logger.debug("Launching new Chrome instance")
   const { port } = await launch({
     chromeFlags,
+    userDataDir: false,
     startingUrl,
-    logLevel: config.PROD ? "silent" : "info",
+    logLevel: config.PROD ? "error" : "verbose",
+    ignoreDefaultFlags: true,
     maxConnectionRetries: 20,
   })
 
