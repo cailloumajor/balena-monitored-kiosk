@@ -33,6 +33,7 @@ export async function launchInstance(startingUrl: string): Promise<number> {
     "--enable-zero-copy",
     "--ignore-gpu-blocklist",
     "--kiosk",
+    "--window-position=0,0",
   ])
 
   const sysfsSizeFile = "/sys/class/graphics/fb0/virtual_size"
