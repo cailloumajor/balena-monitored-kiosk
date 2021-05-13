@@ -50,7 +50,6 @@ export async function launchInstance(startingUrl: string): Promise<number> {
   logger.info("Launching a new Chrome instance")
   const { port } = await launch({
     chromeFlags,
-    userDataDir: false,
     startingUrl,
     logLevel: config.PROD ? "error" : "verbose",
     ignoreDefaultFlags: true,
