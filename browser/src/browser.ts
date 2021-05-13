@@ -47,7 +47,7 @@ export async function launchInstance(startingUrl: string): Promise<number> {
     logger.debug(`Unable to read ${sysfsSizeFile}`)
   }
 
-  logger.debug("Launching new Chrome instance")
+  logger.info("Launching a new Chrome instance")
   const { port } = await launch({
     chromeFlags,
     userDataDir: false,
