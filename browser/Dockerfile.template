@@ -1,0 +1,49 @@
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian-node:14-buster-build AS builder
+
+WORKDIR /usr/src/app
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY tsconfig.json ./
+COPY src/*.ts src/
+RUN yarn build
+
+
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian-node:14-buster-run AS final
+
+RUN set -eux; \
+    install_packages \
+        chromium \
+        chromium-sandbox \
+        dbus-x11 \
+        gosu \
+        libgl1-mesa-dri \
+        tini \
+        x11-xserver-utils \
+        xinit \
+        xserver-xorg-core \
+        xserver-xorg-input-libinput \
+        xserver-xorg-legacy \
+        xserver-xorg-video-fbdev \
+    ; \
+    mkdir --mode=1777 /tmp/.X11-unix; \
+    echo "allowed_users=anybody" > /etc/X11/Xwrapper.config; \
+    useradd --user-group --system --create-home --no-log-init node-app; \
+    usermod --groups tty node-app;
+WORKDIR /usr/src/app
+
+ENV NODE_ENV=production
+
+COPY package.json yarn.lock ./
+RUN set -eux; \
+    yarn install --frozen-lockfile; \
+    yarn cache clean
+
+COPY --from=builder /usr/src/app/dist ./dist
+
+ENTRYPOINT [ "tini", "--", "/usr/bin/entry.sh" ]
+
+COPY .xsession /home/node-app/
+COPY start.sh /usr/local/bin/
+CMD [ "/usr/local/bin/start.sh" ]
