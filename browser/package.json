@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@godaddy/terminus": "4.7.2",
-    "chrome-launcher": "0.13.4",
+    "chrome-launcher": "0.15.2",
     "express": "4.17.1",
     "morgan": "1.10.0",
     "winston": "3.3.3"
